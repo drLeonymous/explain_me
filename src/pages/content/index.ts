@@ -82,9 +82,7 @@ const closeAll = () => {
 }
 
 const getPosition = () => {
-    const selection = document.getSelection();
-    const pos = selection.getRangeAt(0).getBoundingClientRect();
-    return pos;
+    return document.getSelection().getRangeAt(0).getBoundingClientRect()
 }
 
 const initContentWindow = (pos?: any) => {
@@ -99,7 +97,7 @@ const initContentWindow = (pos?: any) => {
     contentRef.style.padding = '10px 10px 10px 40px';
     contentRef.style.position = 'absolute'
     contentRef.style.left = `${x}px`
-    contentRef.style.top = `${y + height}px`
+    contentRef.style.top = `${y + height + window.scrollY}px`
     contentRef.style.zIndex = '2147483647'
     contentRef.style.width = '50vw'
     contentRef.style.color = 'black'
