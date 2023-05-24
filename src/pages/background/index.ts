@@ -51,7 +51,10 @@ const queryChatGPT = async (port: chrome.runtime.Port, query: string) => {
         return 240;
     }
     try {
-        // Use the fetch API to call the ChatGPT API
+        // Pricing: https://openai.com/pricing
+        // Rate limits: https://platform.openai.com/account/rate-limits
+        // usage: https://platform.openai.com/account/usage
+        // Fetch ChatGPT' API
         let result = ''
         const resp = await fetch('https://api.openai.com/v1/completions', {
             method: 'POST',
@@ -60,8 +63,8 @@ const queryChatGPT = async (port: chrome.runtime.Port, query: string) => {
                 Authorization: `Bearer ${API_KEY}`,
             },
             body: JSON.stringify({
-                // model: 'text-davinci-003',
-                model: 'text-curie-001',
+                // model: 'text-davinci-003',   //$0.0200 per 1K tokens
+                model: 'text-curie-001',        //$0.0020 per 1K tokens
                 prompt: `In the most simple terms explain this: ${query}`,
                 temperature: 0.5,
                 max_tokens: getMaxTokenNum(query),
