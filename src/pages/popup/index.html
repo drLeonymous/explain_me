@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="layout">
+        <h2><img style="vertical-align: baseline; margin-bottom: -1px;" src="/src/pages/assets/logo32.png"/> Explain me!</h2>
+        <p>Register your OpenAI API Key:</p>
+        <div style="display: inline-block">
+            <input id="api_key_input_field" class="key-text"/>
+            <button id="save_btn" class="button button-inline button-action">Done</button>
+            <p class="footer">
+                If you don't have an API Key go to
+                <a href="https://beta.openai.com/account/api-keys" target="_blank"> OpenAI</a>
+                and get one!
+            </p>
+        </div>
+        <script defer type="module" src="popup.ts"></script>
+    </div>
+</body>
+</html>

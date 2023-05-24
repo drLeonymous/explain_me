@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Explain me!",
+  "description": "Explain selected text with ChatGPT AI models",
+  "version": "0.0.1",
+  "icons": {
+    "16": "src/pages/assets/logo16.png",
+    "48": "src/pages/assets/logo32.png",
+    "128": "src/pages/assets/logo96.png"
+  },
+  "permissions": ["storage", "contextMenus"],
+  "host_permissions": ["*://*/*"],
+  "background": {
+    "service_worker": "src/pages/background/index.js"
+  },
+  "content_scripts": [
+    {
+      "js": ["src/pages/content/index.js"],
+      "matches": ["https://*/*"]
+    }
+  ],
+  "action": {
+    "default_title": "Explain me!",
+    "default_icon": "src/pages/assets/logo16.png",
+    "default_popup": "src/pages/popup/index.html"
+  }
+}
