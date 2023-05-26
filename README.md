@@ -1,6 +1,6 @@
 # ![Explain me](src/pages/assets/logo96.png) Explain me! #
 
-## The Chrome' extension that explain selected text with ChatGPT AI models ##
+## The Chrome' extension that explain selected text using ChatGPT AI models ##
 ---
 
 1. `git clone <repo address>`
