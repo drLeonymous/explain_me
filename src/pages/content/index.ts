@@ -9,10 +9,6 @@ interface SelectedEventInfoInterface {
     y: number
 }
 
-interface SelectedEventInterface extends Event {
-    info: SelectedEventInfoInterface
-}
-
 class SelectedEvent extends Event {
     info: SelectedEventInfoInterface
 
@@ -58,7 +54,7 @@ const image = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr
         16scijaXKpwBjcevTENyYzJomOWRG4sO4K716RypJT1rfUoVDnAo2sQSt78S9AV0uG50LsSfDWS3\
         jgUFcD1Zj0w+tyO7ZczzFATzSv951BLJk+0OAIjiK0+eaDMHbSLkiaWD0JsdAQDkd2BZAsa9T4LZ\
         gcSyQQS7kkQnrpoRzVdkBwDEUHRVkkQz/0WNwRxMiWVq2+GaIXdWo8G1njKqh9xJ5UO2UD4kg2QF\
-        AOzO73k3giffGUqsPMWH4by+g5sRqV3Pi2R5g/8FFV1HB7xKZVMAAAAASUVORK5CYII=`;
+        AOzO73k3giffGUqsPMWH4by+g5sRqV3Pi2R5g/8FFV1HB7xKZVMAAAAASUVORK5CYII=`
 
 const setResponseToWindow = (res: string) => {
     if (contentRef) contentRef.innerHTML = res
@@ -81,20 +77,18 @@ const closeAll = () => {
     closeContent()
 }
 
-const getPosition = () => {
-    return document.getSelection().getRangeAt(0).getBoundingClientRect()
-}
+const getPosition = () => document.getSelection().getRangeAt(0).getBoundingClientRect()
 
 const initContentWindow = (pos?: any) => {
-    pos = pos ? pos : getPosition();
-    const { x, y, height } = pos;
+    pos = pos || getPosition()
+    const { x, y, height } = pos
 
     contentRef = document.createElement('div')
     contentRef.id = contentID
-    contentRef.style.boxShadow = "rgba(0, 0, 0, 0.2) 0px 1px 3px";
-    contentRef.style.background = `url('${image}') no-repeat left center rgb(243, 243, 243)`;
+    contentRef.style.boxShadow = 'rgba(0, 0, 0, 0.2) 0px 1px 3px'
+    contentRef.style.background = `url('${image}') no-repeat left center rgb(243, 243, 243)`
     contentRef.style.border = '1px solid rgb(187, 187, 187)'
-    contentRef.style.padding = '10px 10px 10px 40px';
+    contentRef.style.padding = '10px 10px 10px 40px'
     contentRef.style.position = 'absolute'
     contentRef.style.left = `${x}px`
     contentRef.style.top = `${y + height + window.scrollY}px`
@@ -104,7 +98,7 @@ const initContentWindow = (pos?: any) => {
     contentRef.innerHTML = 'Waiting for response...'
 
     document.body.appendChild(contentRef)
-};
+}
 
 const queryGPT = (text: string) => {
     const uuid = Math.random().toString(36).substring(2, 15)
@@ -124,22 +118,22 @@ const queryGPT = (text: string) => {
 }
 
 document.addEventListener('selectionEnd', () => {
-    const pos = getPosition();
-    const { x, y, height } = pos;
+    const pos = getPosition()
+    const { x, y, height } = pos
     const selectionText = document.getSelection().toString()
     if (selectionText.length > 1) {
         iconButtonRef = document.createElement('div')
         iconButtonRef.id = popoverID
         iconButtonRef.style.background = `url('${image}') no-repeat center rgb(243, 243, 243)`
-        iconButtonRef.style.border = 'rgb(187, 187, 187)';
+        iconButtonRef.style.border = 'rgb(187, 187, 187)'
         iconButtonRef.style.position = 'absolute'
         iconButtonRef.style.height = '32px'
         iconButtonRef.style.width = '32px'
         iconButtonRef.style.left = `${x}px`
         iconButtonRef.style.top = `${y + height + window.scrollY}px`
         iconButtonRef.style.zIndex = '2147483647'
-        iconButtonRef.style.padding = '2px';
-        iconButtonRef.style.borderRadius = '5px';
+        iconButtonRef.style.padding = '2px'
+        iconButtonRef.style.borderRadius = '5px'
 
         iconButtonRef.onmouseover = () => {
             iconButtonRef.style.cursor = 'pointer'

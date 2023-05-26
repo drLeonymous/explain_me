@@ -26,10 +26,18 @@ const postToContentScript = (payload: { port: chrome.runtime.Port, action: strin
 }
 
 const queryChatGPT = async (port: chrome.runtime.Port, query: string) => {
-    let API_KEY = null;
+    let API_KEY = null
+    let MODEL = null
+    let TEMP = 0
+    let TRETURN = 0
     try {
-        const keyObj = await chrome.storage.local.get('openaiKey')
-        API_KEY = structuredClone(keyObj).openaiKey
+        let storage = await chrome.storage.local.get()
+        storage = structuredClone(storage);
+        ({
+            openaiKey: API_KEY,
+            m: MODEL, t: TEMP,
+            tr: TRETURN,
+        } = storage)
     } catch (error) {
         postToContentScript({
             port,
@@ -46,10 +54,7 @@ const queryChatGPT = async (port: chrome.runtime.Port, query: string) => {
         })
         return '[ERROR] Missing API key'
     }
-    const getMaxTokenNum = (_query: string): number => {
-        // split the query by " " and count it, then accordinglly return token numbers
-        return 240;
-    }
+
     try {
         // Pricing: https://openai.com/pricing
         // Rate limits: https://platform.openai.com/account/rate-limits
@@ -63,11 +68,10 @@ const queryChatGPT = async (port: chrome.runtime.Port, query: string) => {
                 Authorization: `Bearer ${API_KEY}`,
             },
             body: JSON.stringify({
-                // model: 'text-davinci-003',   //$0.0200 per 1K tokens
-                model: 'text-curie-001',        //$0.0020 per 1K tokens
+                model: MODEL || "text-davinci-003",
                 prompt: `In the most simple terms explain this: ${query}`,
-                temperature: 0.5,
-                max_tokens: getMaxTokenNum(query),
+                temperature: Number(TEMP) || 0.5,
+                max_tokens: Number(TRETURN) || 240,
                 stream: true,
             }),
         })

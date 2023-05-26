@@ -30,6 +30,7 @@ export default ({ mode, command }: { mode: string, command: string }) => {
                     content: resolve(pagesDir, 'content', 'index.ts'),
                     background: resolve(pagesDir, 'background', 'index.ts'),
                     popup: resolve(pagesDir, 'popup', 'index.html'),
+                    options: resolve(pagesDir, 'options', 'index.html'),
                 },
                 output: {
                     entryFileNames: chunk => `src/pages/${chunk.name}/index.js`,

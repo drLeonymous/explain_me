@@ -23,5 +23,6 @@
     "default_title": "Explain me!",
     "default_icon": "src/pages/assets/logo16.png",
     "default_popup": "src/pages/popup/index.html"
-  }
+  },
+  "options_page": "src/pages/options/index.html"
 }
