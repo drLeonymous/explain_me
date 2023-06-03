@@ -27,6 +27,7 @@ const postToContentScript = (payload: { port: chrome.runtime.Port, action: strin
 
 const queryChatGPT = async (port: chrome.runtime.Port, query: string) => {
     let API_KEY = null
+    let _PROMPT = null
     let MODEL = null
     let TEMP = 0
     let TRETURN = 0
@@ -35,7 +36,9 @@ const queryChatGPT = async (port: chrome.runtime.Port, query: string) => {
         storage = structuredClone(storage);
         ({
             openaiKey: API_KEY,
-            m: MODEL, t: TEMP,
+            p: _PROMPT,
+            m: MODEL,
+            t: TEMP,
             tr: TRETURN,
         } = storage)
     } catch (error) {
@@ -61,7 +64,7 @@ const queryChatGPT = async (port: chrome.runtime.Port, query: string) => {
         // usage: https://platform.openai.com/account/usage
         // Fetch ChatGPT' API
         let result = ''
-        const resp = await fetch('https://api.openai.com/v1/completions', {
+        const resp: Response = await fetch('https://api.openai.com/v1/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -69,7 +72,7 @@ const queryChatGPT = async (port: chrome.runtime.Port, query: string) => {
             },
             body: JSON.stringify({
                 model: MODEL || "text-davinci-003",
-                prompt: `In the most simple terms explain this: ${query}`,
+                prompt: `${_PROMPT || 'In the most simple terms explain this:'} ${query}`,
                 temperature: Number(TEMP) || 0.5,
                 max_tokens: Number(TRETURN) || 240,
                 stream: true,
@@ -77,8 +80,9 @@ const queryChatGPT = async (port: chrome.runtime.Port, query: string) => {
         })
 
         if (!resp.ok) {
-            throw new Error('[ERROR] ChatGPT failed, please check your API key or use another sentence')
+            return resp.json()
         }
+
         const parser = createParser(event => {
             if (event.type === 'event') {
                 const message = event.data
@@ -123,14 +127,19 @@ const queryChatGPT = async (port: chrome.runtime.Port, query: string) => {
     return ''
 }
 
-chrome.runtime.onConnect.addListener(port => {
+chrome.runtime.onConnect.addListener((port) => {
     if (port.name.startsWith('content-script')) {
-        port.onMessage.addListener(async (msg: any) => {
+        port.onMessage.addListener(async (msg) => {
             try {
-                const query = msg
-                queryChatGPT(port, query)
+                const resp = await queryChatGPT(port, msg);
+                if (resp?.error) {
+                    postToContentScript({
+                        port,
+                        action: 'ans',
+                        mes: `[ERROR]:: ${resp.error?.code}`,
+                    })
+                }
             } catch (err: any) {
-                console.error(err)
                 postToContentScript({
                     port,
                     action: 'ans',

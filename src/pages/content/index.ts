@@ -4,21 +4,6 @@
 // Several foreground scripts can be declared
 // and injected into the same or different pages.
 
-interface SelectedEventInfoInterface {
-    x: number
-    y: number
-}
-
-class SelectedEvent extends Event {
-    info: SelectedEventInfoInterface
-
-    constructor(type: string, info: SelectedEventInfoInterface) {
-        super(type)
-        this.info = info
-    }
-}
-
-let selectionEndTimeout: NodeJS.Timeout = null
 let iconButtonRef: HTMLElement = null
 let contentRef: HTMLElement = null
 const popoverID = 'popover-button-id'
@@ -56,25 +41,28 @@ const image = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr
         gcSyQQS7kkQnrpoRzVdkBwDEUHRVkkQz/0WNwRxMiWVq2+GaIXdWo8G1njKqh9xJ5UO2UD4kg2QF\
         AOzO73k3giffGUqsPMWH4by+g5sRqV3Pi2R5g/8FFV1HB7xKZVMAAAAASUVORK5CYII=`
 
-const setResponseToWindow = (res: string) => {
-    if (contentRef) contentRef.innerHTML = res
+const cls = {
+    iconButton: () => {
+        if (iconButtonRef) {
+            document.body.removeChild(iconButtonRef)
+            iconButtonRef = null
+        }
+    },
+
+    content: () => {
+        if (contentRef) {
+            document.body.removeChild(contentRef)
+            contentRef = null
+        }
+    },
+    all: () => {
+        cls.iconButton()
+        cls.content()
+    }
 }
 
-const closeIconButton = () => {
-    if (iconButtonRef) {
-        document.body.removeChild(iconButtonRef)
-        iconButtonRef = null
-    }
-}
-const closeContent = () => {
-    if (contentRef) {
-        document.body.removeChild(contentRef)
-        contentRef = null
-    }
-}
-const closeAll = () => {
-    closeIconButton()
-    closeContent()
+const setResponseToWindow = (res: string) => {
+    if (contentRef) contentRef.innerHTML = res
 }
 
 const getPosition = () => document.getSelection().getRangeAt(0).getBoundingClientRect()
@@ -148,22 +136,29 @@ document.addEventListener('selectionEnd', () => {
 })
 document.addEventListener('click', (evt: MouseEvent) => {
     const { id } = evt.target as any
-    if (id === contentID || id === popoverID) closeIconButton()
-    else closeAll()
+    if (id === contentID || id === popoverID) cls.iconButton()
+    else cls.all()
 })
 
 // [REGION] debounce of selection event and icon appear
+class SelectedEvent extends Event {
+    info: Record<string, number>
+
+    constructor(type: string, info: Record<string, number>) {
+        super(type)
+        this.info = info
+    }
+}
+
+let selectionEndTimeout: NodeJS.Timeout = null
 document.addEventListener('mouseup', (evt: MouseEvent) => {
     selectionEndTimeout = setTimeout(() => {
         const noContentWindow = !contentRef
         const haveText = window.getSelection().toString() !== ''
         if (noContentWindow && haveText) {
-            const coordinates = {
+            const info = {
                 x: evt.pageX - document.body.scrollLeft,
                 y: evt.pageY - document.body.scrollTop,
-            }
-            const info = {
-                ...coordinates,
             }
             const selectionEndEvent = new SelectedEvent('selectionEnd', info)
             document.dispatchEvent(selectionEndEvent)
@@ -180,7 +175,7 @@ document.addEventListener('selectionchange', () => {
 
 chrome.runtime.onMessage.addListener(async (message: any) => {
     if (message.action === 'contextMenu') {
-        closeAll()
+        cls.all()
         const selectionText = document.getSelection().toString()
         initContentWindow()
         queryGPT(selectionText)

@@ -1,3 +1,4 @@
+const _prompt = document.getElementById('prompt') as HTMLInputElement
 const model = document.getElementById('model') as HTMLSelectElement
 const temp = document.getElementById('model_temperture') as HTMLInputElement
 const output = document.getElementById('temp_value') as HTMLDivElement
@@ -8,7 +9,8 @@ const reset = document.getElementById('reset_btn') as HTMLButtonElement
 
 const ft = (t: any) => Number.parseFloat(t).toFixed(1)
 const restFromStorage = async () => {
-    const { m, t, tr } = await chrome.storage.local.get()
+    const { p, m, t, tr } = await chrome.storage.local.get()
+    _prompt.value = p || 'In the most simple terms explain this'
     model.value = m || 'text-davinci-003'
     temp.value = t || 0.5
     output.innerHTML = t || 0.5
@@ -26,6 +28,7 @@ treturn.oninput = (e: any) => { trOutput.innerHTML = ft(e.target.value) }
 
 save.onclick = async () => {
     await chrome.storage.local.set({
+        p: _prompt.value,
         m: model.value,
         t: temp.value,
         tr: treturn.value,
